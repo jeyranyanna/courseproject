@@ -31,27 +31,19 @@ class Timer(MDScreen, threading.Thread):
     count_pomidoros = NumericProperty()          # количество помидорок
     session_before_long_pause = 0                # номер сессии до длительного перерыва
     current_running_time = NumericProperty(0)    # текущее время
-    how_long_to_work = 10                        # время рабочей сессии
-    how_long_to_pause = 5                        # время отдыха
-    how_long_to_pause_long = 8                   # время длительного перерыва
+    how_long_to_work = 25 * 60                   # время рабочей сессии
+    how_long_to_pause = 5 * 60                   # время отдыха
+    how_long_to_pause_long = 15 * 60             # время длительного перерыва
     remaining_time = NumericProperty(0)          # оставшееся время до следующей итерации
     running_time = StringProperty('')            # текущее время в строковом формате
     is_stopped = False
     bt_start_timer = ObjectProperty(None)
 
 
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        print('init')
-
-
     # запуск таймера в потоке
     def run_thread(self):
         print(self)
         while self.running and not Timer.is_stopped:
-            print(self.running)
-            print(self.current_running_time)
             if self.current_running_time > 0:  # когда таймер работает
                 self.current_running_time -= 1  # уменьшение таймера
 
@@ -97,19 +89,13 @@ class Timer(MDScreen, threading.Thread):
 
     # запуск таймера
     def start_timer(self):
-        self.ids.bt_start_timer.disabled = True
+        self.ids.bt_start_timer.disabled = True # блокировка кнопки play
+        Timer.is_stopped = False
         if(Timer.is_stopped):
             self.reset_timer()
-        Timer.is_stopped = False
-
-        self.run_thread()
         self.running = True
-        thread = threading.Thread(target=self.run_thread)
-                # класс Thread модуля threading запускает какое-либо действие для выполнения в отдельном потоке управления
-                # для запуска действия (функции run_thread) передаем  его в конструктор
-
+        thread = threading.Thread(target=self.run_thread) # передача функции в конструктор
         thread.start()  # запуск потока при вызове внутреннего метода run
-
 
     # остановка таймера
     def pause_timer(self):
